@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Hangman</string>
+    <string name="edit_message">Guess a character</string>
+    <string name="button_send">Send</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_display_message">Wow Text!</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_new">New Game</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="n_letters">Word length</string>
+    <string name="n_wrong">Allowed misguesses</string>
+    <string name="save_settings">Save</string>
+    <string name="default_settings_value">7</string>
+    <string name="button_guess">Guess</string>
+    
+
+</resources>

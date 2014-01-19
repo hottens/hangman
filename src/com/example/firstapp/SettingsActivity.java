@@ -1,25 +1,31 @@
 package com.example.firstapp;
 
-import android.os.Bundle;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.app.Activity;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.os.Build;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import android.support.v4.app.NavUtils;
-import android.annotation.TargetApi;
-import android.os.Build;
-import android.preference.PreferenceManager;
+import android.widget.ToggleButton;
 
 public class SettingsActivity extends Activity {
 	SeekBar seekbarL;
 	SeekBar seekbarW;
 	TextView letters;
 	TextView wrongs;
+	ToggleButton evilToggle;
 
 
 	@Override
@@ -33,6 +39,7 @@ public class SettingsActivity extends Activity {
 		wrongs = (TextView) findViewById(R.id.nW);
 		seekbarW = (SeekBar) findViewById(R.id.numberOfWrongLetters);
 		seekbarL = (SeekBar) findViewById(R.id.numberOfLetters);
+		evilToggle = (ToggleButton) findViewById(R.id.eviltoggle);
 		seekbarL.setOnSeekBarChangeListener( new OnSeekBarChangeListener()
 			{
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
@@ -71,6 +78,7 @@ public class SettingsActivity extends Activity {
 				
 			}
 		});
+		
 		loadSavedPreferences();
 		
 	}
@@ -85,6 +93,8 @@ public class SettingsActivity extends Activity {
 	public void saveSettings(View v){
 		savePreferences("Letters_Value",Integer.toString(seekbarL.getProgress()));
 		savePreferences("Wrongs_Value",Integer.toString(seekbarW.getProgress()));
+		savePreferences("Evil_Toggle",Boolean.toString(evilToggle.isChecked()));
+		Log.v("evil",String.valueOf(evilToggle.isChecked()));
 		finish();
 	}
 
@@ -93,10 +103,13 @@ public class SettingsActivity extends Activity {
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 			int wrongsValue = Integer.parseInt(sharedPreferences.getString("Wrongs_Value", Integer.toString(R.string.default_settings_value)));
 		    int lettersValue = Integer.parseInt(sharedPreferences.getString("Letters_Value", Integer.toString(R.string.default_settings_value)));
-		    int maxLetters = Integer.parseInt(sharedPreferences.getString("Max_Letters", Integer.toString(15)));
+		    int maxLetters = Integer.parseInt(sharedPreferences.getString("Max_Letters", Integer.toString(24)));
+		    boolean checked = Boolean.parseBoolean(sharedPreferences.getString("Evil_Toggle", Boolean.TRUE.toString()));
+		    Log.v("load evil",String.valueOf(checked));
 		    seekbarL.setProgress(lettersValue);
 		    seekbarW.setProgress(wrongsValue);
 		    seekbarL.setMax(maxLetters);
+		    evilToggle.setChecked(checked);
 	}
 
 
@@ -128,7 +141,8 @@ public class SettingsActivity extends Activity {
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
-			NavUtils.navigateUpFromSameTask(this);
+			//NavUtils.navigateUpFromSameTask(this);
+			finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

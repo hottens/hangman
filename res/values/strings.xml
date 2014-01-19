@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Hangman</string>
+    <string name="app_name">EvilHangman</string>
     <string name="edit_message">Guess a character</string>
     <string name="button_send">Send</string>
     <string name="action_settings">Settings</string>
+    <string name="action_highscores">Highscores</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_display_message">Wow Text!</string>
     <string name="hello_world">Hello world!</string>
@@ -15,6 +16,7 @@
     <string name="save_settings">Save</string>
     <string name="default_settings_value">7</string>
     <string name="button_guess">Guess</string>
-    
+    <string name="title_activity_high_scores">HighScoresActivity</string>
+    <string name="title_activity_win">WinActivity</string>
 
 </resources>

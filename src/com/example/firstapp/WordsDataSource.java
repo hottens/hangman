@@ -1,6 +1,7 @@
 package com.example.firstapp;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -18,6 +19,9 @@ public class WordsDataSource {
   private MySQLiteHelper dbHelper;
   private String[] allColumns = { MySQLiteHelper.COLUMN_ID,
       MySQLiteHelper.COLUMN_WORD, MySQLiteHelper.COLUMN_LENGTH };
+  private String[] allScoreColumns = { MySQLiteHelper.COLUMN_ID,
+	      MySQLiteHelper.COLUMN_WORD, MySQLiteHelper.COLUMN_SCORE,
+	      MySQLiteHelper.COLUMN_DATE,MySQLiteHelper.COLUMN_EVIL};
 
   public WordsDataSource(Context context) {
     dbHelper = new MySQLiteHelper(context);
@@ -40,9 +44,9 @@ public class WordsDataSource {
     
     Log.v("Values",values.toString());
     Log.v("Database",database.toString());
-    long insertId = database.insert(MySQLiteHelper.TABLE_WORDS, null,
+    long insertId = database.insert(MySQLiteHelper.TABLE_DICT, null,
         values);
-    Cursor cursor = database.query(MySQLiteHelper.TABLE_WORDS,
+    Cursor cursor = database.query(MySQLiteHelper.TABLE_DICT,
         allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null,
         null, null, null);
     cursor.moveToFirst();
@@ -50,18 +54,28 @@ public class WordsDataSource {
     cursor.close();
     return newWord;
   }
+  
+  public void addHighScore(String word,int score,boolean evil){
+	  Date date = (new java.sql.Date(System.currentTimeMillis()));
+	  ContentValues values = new ContentValues(); 
+	  values.put(MySQLiteHelper.COLUMN_WORD, word);
+	  values.put(MySQLiteHelper.COLUMN_SCORE, score);
+	  values.put(MySQLiteHelper.COLUMN_DATE, date.toString());
+	  values.put(MySQLiteHelper.COLUMN_EVIL, Boolean.toString(evil));
+	  database.insert(MySQLiteHelper.TABLE_HS , null, values); 
+  }
 
   public void deleteWord(Word word) {
     long id = word.getId();
     System.out.println("Comment deleted with id: " + id);
-    database.delete(MySQLiteHelper.TABLE_WORDS, MySQLiteHelper.COLUMN_ID
+    database.delete(MySQLiteHelper.TABLE_DICT, MySQLiteHelper.COLUMN_ID
         + " = " + id, null);
   }
 
   public List<Word> getAllWords() {
     List<Word> words = new ArrayList<Word>();
 
-    Cursor cursor = database.query(MySQLiteHelper.TABLE_WORDS,
+    Cursor cursor = database.query(MySQLiteHelper.TABLE_DICT,
         allColumns, null, null, null, null, null);
 
     cursor.moveToFirst();
@@ -75,29 +89,34 @@ public class WordsDataSource {
     return words;
   }
   
-  public int getMaxLength() {
-	    //Cursor cursor = database.query(MySQLiteHelper.TABLE_WORDS, new String [] {"MAX(length)"}, null, null, null, null, null);
-	    /*int length = 0;
-	    String qry = "SELECT MAX(length) FROM " + MySQLiteHelper.TABLE_WORDS;
-	    Cursor cursor = database.rawQuery(qry,null);
-	    Log.v("WordsDataSource","getMax " + cursor.getColumnName(0) );
-	    if (cursor.moveToFirst()) {
-	    	length = cursor.getInt(0);
-	    	Log.v("WordsDataSource","getMax " + length );
+  public List<Score> getAllScores() {
+	    List<Score> scores = new ArrayList<Score>();
+
+	    Cursor cursor = database.query(MySQLiteHelper.TABLE_HS,
+	        allScoreColumns, null, null, null, null, "score");
+
+	    cursor.moveToFirst();
+	    while (!cursor.isAfterLast()) {
+	      Score score = cursorToScore(cursor);
+	      scores.add(score);
+	      cursor.moveToNext();
 	    }
+	    // make sure to close the cursor
 	    cursor.close();
-	    
-	    return length;*/
-	    final SQLiteStatement stmt = database.compileStatement("SELECT MAX(length) FROM " +MySQLiteHelper.TABLE_WORDS);
+	    return scores;
+	  }
+  
+  public int getMaxLength() {
+	    final SQLiteStatement stmt = database.compileStatement("SELECT MAX(length) FROM " +MySQLiteHelper.TABLE_DICT);
 
 	    return (int) stmt.simpleQueryForLong();
   }
   
-  public List<Word> getWordsWithLength(int length) {
-	    List<Word> words = new ArrayList<Word>();
+  public List<String> getWordsWithLength(int length) {
+	    List<String> words = new ArrayList<String>();
 
 	    Cursor cursor = database.query(
-		    MySQLiteHelper.TABLE_WORDS /* table */,
+		    MySQLiteHelper.TABLE_DICT /* table */,
 		    new String[] { "*" } /* columns */,
 		    "length= ?" /* where or selection */,
 		    new String[] { String.valueOf(length) }/* selectionArgs i.e. value to replace ? */,
@@ -108,24 +127,29 @@ public class WordsDataSource {
 	    cursor.moveToFirst();
 	    while (!cursor.isAfterLast()) {
 	      Word word = cursorToWord(cursor);
-	      words.add(word);
+	      words.add(word.getWord());
 	      cursor.moveToNext();
 	    }
 	    // make sure to close the cursor
 	    cursor.close();
 	    return words;
-	  }
+  }
 
   private Word cursorToWord(Cursor cursor) {
     Word word = new Word();
     word.setId(cursor.getLong(0));
     word.setWord(cursor.getString(1));
-    /*Log.v("Version",String.valueOf(database.getVersion()));
-    for(int i=0;i<cursor.getColumnNames().length;i++){
-    	Log.v("Cursor to Word",cursor.getColumnNames()[i]);
-    }*/
-    
     word.setLength(cursor.getInt(2));
     return word;
   }
+  
+  private Score cursorToScore(Cursor cursor) {
+	    Score score = new Score();
+	    score.setId(cursor.getLong(0));
+	    score.setWord(cursor.getString(1));
+	    score.setScore(cursor.getInt(2));	    
+	    score.setDate(cursor.getString(3));
+	    score.setEvil(Boolean.parseBoolean(cursor.getString(4)));
+	    return score;
+	  }
 } 

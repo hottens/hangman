@@ -11,13 +11,15 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:textAppearance="?android:attr/textAppearanceLarge" />
-    	
-	<TextView
-	        android:id="@+id/word"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:text="wtffff"
-	        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/word"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="word"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
 	<LinearLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
@@ -41,7 +43,6 @@
 	        android:id="@+id/guessed"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:text="wtffff"
 	        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </LinearLayout>

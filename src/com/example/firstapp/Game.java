@@ -12,14 +12,14 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class Game {
-	private WordsDataSource datasource;
+	WordsDataSource datasource;
 	Context c;
-	int nW,nL;
+	int nW,nL,W;
 	ArrayList<Character> guessed;
 	String str;
-	private ArrayList<String> possibleWords;
-	private Random randomGenerator;
+	Random randomGenerator;
 	String curWord;
+	boolean evil;
 	
 	public Game(Context context){
 		this.datasource = new WordsDataSource(context);
@@ -27,13 +27,14 @@ public class Game {
 		this.randomGenerator = new Random();
 		this.curWord="";
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-		this.possibleWords = new ArrayList<String>();
 		this.c = context;
 		this.str = "";
 		this.guessed = new ArrayList<Character>(); 
 		this.nW = Integer.parseInt(sharedPref.getString("Wrongs_Value", Integer.toString(8)));
 		this.nL = Integer.parseInt(sharedPref.getString("Letters_Value", Integer.toString(4)));
-		
+		this.evil = Boolean.parseBoolean(sharedPref.getString("Evil_Toggle", Boolean.TRUE.toString()));
+		Log.v("evil game",String.valueOf(sharedPref.getString("Evil_Toggle", Boolean.TRUE.toString())));
+		this.W = this.nW;
 		for (int i = 0; i < this.nL; i++){
 			this.str +="_ ";
 		}
@@ -44,7 +45,6 @@ public class Game {
 			this.str = "Could not find a word";
 		}
 		savePreferences("Max_Letters",String.valueOf(datasource.getMaxLength()));
-		;
 	}
 	
 	private void savePreferences(String key, String value) {
@@ -63,10 +63,10 @@ public class Game {
 			datasource.createWord(s);
 		}*/
 		//pick random from possibleWords
-		List<Word> values = datasource.getWordsWithLength(this.nL);
+		List<String> values = datasource.getWordsWithLength(this.nL);
 		if(values.size()==0) return false;
 		int rand = randomGenerator.nextInt(values.size());
-		this.curWord = values.get(rand).getWord();
+		this.curWord = values.get(rand);
 		Log.v("Game","Current word: "+this.curWord);
 		return true;
 	}
@@ -78,20 +78,20 @@ public class Game {
 		if(str.length()==1){
 			char ch = str.charAt(0);
 			ch = Character.toUpperCase(ch);
-			if (!Character.isLetter(ch)){
+			if (!Character.isLetter(ch)){//No alphabetical input
 				return 1;
-			} else if(!this.guessed.contains(ch)){
-				if (!this.addGuessed(ch)){
+			} else if(!this.guessed.contains(ch)){//Not yet guessed
+				if (!this.addGuessed(ch)){//Lose
 					return 2;
 				} else {
-					if(this.validate()){
+					if(this.validate()){//Win
 						return 3;
 					}
 				}
-			} else {
+			} else {//Already guessed
 				return 4;	
 			}
-		} else {
+		} else {//Something went wrong
 			return 5;
 		}
 		return 0;
@@ -104,13 +104,13 @@ public class Game {
 		} else {
 			setString();
 		}
-		if (this.nW <= 0){
+		if (this.nW < 0){
 			return false;
 		}
-		Log.v("Game","number of misguesses left: "+this.nW);
+		//Log.v("Game","number of misguesses left: "+this.nW);
 		return true;
 	}
-	private void setString() {
+	public void setString() {
 		for (int i = 0; i < this.curWord.length();i++){
 			if(this.guessed.contains(this.curWord.charAt(i))){
 				char[] strChars = this.str.toCharArray();
@@ -127,6 +127,11 @@ public class Game {
 			}
 		}
 		return true;
+	}
+	
+	public void setHighScore(){
+		Log.v("Score",String.valueOf(this.W-this.nW));
+		this.datasource.addHighScore(this.curWord, this.W-this.nW,this.evil);
 	}
 	
 }

@@ -15,6 +15,9 @@
 		    <item android:id="@+id/action_settings"
 		          android:title="@string/action_settings"
 		          android:showAsAction="always" />
+		    <item android:id="@+id/action_highscores"
+		          android:title="@string/action_highscores"
+		          android:showAsAction="always" />
 		</menu>
 	</item>
 </menu>

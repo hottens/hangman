@@ -16,9 +16,10 @@
         android:id="@+id/word"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="word"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:text="word"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="30sp" />
 
 	<LinearLayout
 	    android:layout_width="match_parent"

@@ -13,12 +13,10 @@ import android.util.Log;
 
 public class EvilGame extends Game{
 	Cursor cursor;
-	List<String> possibleWords;
 
 	public EvilGame(Context context) {
 		super(context);
-		this.possibleWords = new ArrayList<String>();
-		this.possibleWords = this.datasource.getWordsWithLength(nL);
+		
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -36,7 +34,8 @@ public class EvilGame extends Game{
 		} else {
 			setString();
 		}
-		if (this.nW <= 0){
+		curWord = possibleWords.get(0);
+		if (this.nW < 0){
 			return false;
 		}
 		//Log.v("Game","number of misguesses left: "+this.nW);
@@ -57,13 +56,14 @@ public class EvilGame extends Game{
 		for(String word : possibleWords){
 			copy.add(word);
 		}
+		//Store indeces of char with word
 		Map<String, String> m = new HashMap<String,String>();
 		for(int i=0;i<size;i++){
 			String word = copy.get(i);
-			
-			if(word.contains(String.valueOf(ch))){
+			String indeces =indecesOfChInWord(ch,word);
+			if(!indeces.equals("")){//if(word.contains(String.valueOf(ch))){
 				//Log.v("word with ch",word);
-				String indeces = indecesOfChInWord(ch,word);
+				//String indeces = indecesOfChInWord(ch,word);
 				m.put(word, indeces);
 				//Log.v("Word-indeces",word+"\t" + indeces);
 				possibleWords.remove(word);

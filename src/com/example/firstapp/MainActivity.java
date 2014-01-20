@@ -1,8 +1,16 @@
 package com.example.firstapp;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,7 +30,8 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);	    
+		setContentView(R.layout.activity_main);	 
+		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		tv = (TextView) findViewById(R.id.word);
 		this.game = new Game(this);
@@ -32,6 +41,7 @@ public class MainActivity extends Activity {
 		}
 		
 		tv.setText(game.getString());
+		correctWidth(tv);
 		
 		this.guessed = (TextView) findViewById(R.id.guessed);
 		this.guessed.setText(this.game.guessed.toString());
@@ -50,7 +60,7 @@ public class MainActivity extends Activity {
 	public void guess(View v){
 		EditText editText = (EditText) findViewById(R.id.input);
 		String str = editText.getText().toString();
-		if(this.game.nW<0) return;
+		if(this.game.nW<0 || !this.game.getString().contains("_")) return;
 		int event = this.game.guessLetter(str);
 		updateFields();
 		switch(event) {
@@ -127,5 +137,33 @@ public class MainActivity extends Activity {
 	public void openHighscores() {
 	    Intent intent = new Intent(this, HighScoresActivity.class);
 	    startActivity(intent);
+	}
+	
+	@SuppressLint("NewApi")
+	public void correctWidth(TextView textView)
+	{
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int desiredWidth = size.x;
+		
+	    Paint paint = new Paint();
+	    Rect bounds = new Rect();
+
+	    paint.setTypeface(textView.getTypeface());
+	    float textSize = textView.getTextSize();
+	    paint.setTextSize(textSize);
+	    String text = textView.getText().toString();
+	    paint.getTextBounds(text, 0, text.length(), bounds);
+
+	    //Log.v("pre while widths","bounds: "+String.valueOf(bounds.width())+ " desiredWidth: " + String.valueOf(desiredWidth));
+	    while (2*bounds.width() < desiredWidth-100)
+	    {
+	        textSize++;
+	        paint.setTextSize(textSize);
+	        paint.getTextBounds(text, 0, text.length(), bounds);
+	    }
+
+	    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 	}
 }

@@ -20,8 +20,10 @@ public class Game {
 	Random randomGenerator;
 	String curWord;
 	boolean evil;
+	List<String> possibleWords;
 	
 	public Game(Context context){
+		this.possibleWords = new ArrayList<String>();
 		this.datasource = new WordsDataSource(context);
 		datasource.open();
 		this.randomGenerator = new Random();
@@ -63,10 +65,10 @@ public class Game {
 			datasource.createWord(s);
 		}*/
 		//pick random from possibleWords
-		List<String> values = datasource.getWordsWithLength(this.nL);
-		if(values.size()==0) return false;
-		int rand = randomGenerator.nextInt(values.size());
-		this.curWord = values.get(rand);
+		this.possibleWords = datasource.getWordsWithLength(this.nL);
+		if(this.possibleWords.size()==0) return false;
+		int rand = randomGenerator.nextInt(possibleWords.size());
+		this.curWord = possibleWords.get(rand);
 		Log.v("Game","Current word: "+this.curWord);
 		return true;
 	}
